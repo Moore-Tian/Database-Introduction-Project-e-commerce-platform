@@ -1,0 +1,136 @@
+<template>
+  <div class="product">
+    <router-link :to="'/product/' + info.pk"
+                 class="product-main">
+      <!-- 依次显示商品图片、名称、销量、颜色、单价，加入购物车 -->
+
+      <img :src="`http://127.0.0.1:8000/media/${info.fields.product_image}`" alt="" height="200px">
+      <h4>{{info.fields.product_name}}</h4>
+      <h4>销量{{info.fields.product_sales}}</h4>
+      <div class="product-color"
+           :style="{background: colors[info.fields.product_color]}"></div>
+      <div class="product-cost">￥ {{info.fields.product_cost}}</div>
+      <!-- 阻止冒泡，否则点击按钮的同时也会触发a标签进入详情页 -->
+      <div class="product-add-cart"
+           @click.prevent="handleAddCart">加入购物车</div>
+    </router-link>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    info: Object
+  },
+  data () {
+    return {
+      colors: {
+        '白色': '#ffffff',
+        '黑色': '#100f0f',
+        '灰色': '#a39f9f',
+        '金色': '#dac272',
+        '蓝色': '#233472',
+        '红色': '#f2352e'
+      },
+      product_goods:0,
+      begood:true
+    }
+  },
+  methods: {
+    async handleAddCart(){
+      await this.axios.get('add_to_cart/',
+            {params:{user_id: this.$store.state.userId, product_id: this.info.pk}})
+        .then((response) => {
+            console.log(response);
+            //this.list = response.data.list
+            window.alert("添加成功")
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+
+      //this.$store.commit('addCart', this.info.pk);
+    },
+
+  }
+}
+</script>
+<!-- scoped属性表示只对当前组件有效，不影响其他组件 -->
+<style scoped>
+.product {
+  width: 350px;
+  float: left;
+  margin: 16px;
+}
+
+.product-main {
+  padding: 16px;
+  border: 1px solid #ffc0cb; /* Pink border */
+  border-radius: 10px; /* More rounded corners */
+  overflow: hidden;
+  background: #fff;
+  text-align: center;
+  position: relative;
+  transition: box-shadow 0.3s ease; /* Smooth transition effect */
+}
+
+.product-main:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow on hover */
+}
+
+.product-main img {
+  width: 100%;
+  border-radius: 10px; /* Rounded corners for images */
+}
+
+h4 {
+  color: #222;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 8px 0;
+  font-size: 18px; /* Increased font size for emphasis */
+}
+
+.product-main:hover h4 {
+  color: #ff69b4; /* Pink color on hover */
+}
+
+.product-color {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 1px solid #ffc0cb; /* Pink border */
+  border-radius: 50%;
+  margin: 6px auto;
+}
+
+.product-cost {
+  color: #ff69b4; /* Pink color */
+  margin-top: 6px;
+  font-size: 16px; /* Increased font size */
+}
+
+.product-add-cart {
+  display: none;
+  padding: 6px 12px; /* Increased padding */
+  background: #ff69b4; /* Pink background */
+  color: #fff;
+  font-size: 14px; /* Increased font size */
+  border-radius: 20px; /* More rounded corners */
+  cursor: pointer;
+  position: absolute;
+  top: 10px; /* Adjusted position */
+  right: 10px; /* Adjusted position */
+  transition: background 0.3s ease; /* Smooth transition effect */
+}
+
+.product-main:hover .product-add-cart {
+  display: inline-block;
+}
+
+.product-add-cart:hover {
+  background: #ff1493; /* Darker pink on hover */
+}
+</style>
